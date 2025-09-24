@@ -4,6 +4,7 @@ interface GroupInterface {
   last_name: string;
   midle_name: string;
   group_id: Int32Array;
+  isDeleted?:boolean;
 };
 
 export default GroupInterface;
