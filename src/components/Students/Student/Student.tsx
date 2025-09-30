@@ -19,7 +19,7 @@ const Student = ({ student, onDelete }: Props): React.ReactElement => {
       {' '}
       {student.first_name}
       {' '}
-      {student.midle_name}
+      {student.middle_name}
       {' '}
       <button onClick={onDeleteHandler}>Удалить</button>
     </div>
