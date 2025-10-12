@@ -51,3 +51,32 @@ export const deleteStudentDb = async (id: number): Promise<void> => {
     db.close();
   });
 };
+
+export const addStudentDb = async (student: Omit<StudentInterface, 'id'>): Promise<number> => {
+  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
+
+  return new Promise((resolve, reject) => {
+    const sql = `
+      INSERT INTO student (first_name, last_name, middle_name, group_id, isDeleted) 
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    const params = [
+      student.first_name,
+      student.last_name,
+      student.middle_name,
+      student.group_id,
+      student.isDeleted || false
+    ];
+
+    db.run(sql, params, function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        console.log(`Добавлен студент с ID: ${this.lastID}`);
+        resolve(this.lastID);
+      }
+      db.close();
+    });
+  });
+};

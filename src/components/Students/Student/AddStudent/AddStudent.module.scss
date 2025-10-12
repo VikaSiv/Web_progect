@@ -1,0 +1,29 @@
+.AddStudent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #f7f7f7;
+  border-radius: 12px;
+  margin-bottom: 20px;
+
+  input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  button {
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background-color: #005ad1;
+    }
+  }
+}
