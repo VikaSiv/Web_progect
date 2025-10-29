@@ -1,82 +1,60 @@
-import sqlite3 from 'sqlite3';
-
+import { Student } from './entity/Student.entity';
 import type StudentInterface from '@/types/StudentInterface';
+import getRandomFio from '@/utils/getRandomFio';
+import AppDataSource from './AppDataSource';
 
-sqlite3.verbose();
+const studentRepository = AppDataSource.getRepository(Student);
 
-export const getStudentDb = async (): Promise<StudentInterface[]> => {
-  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
-
-  const students = await new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM student';
-    db.all(sql, [], (err, rows) => {
-      if (err) {
-        reject(err);
-        db.close();
-        return;
-      }
-      resolve(rows);
-      db.close();
-    });
-  });
-
-  // test data
-  // const groups: GroupInterface[] = [
-  //   {
-  //     name: '2207 д2',
-  //   },
-  //   {
-  //     name: '2207 д2',
-  //   },
-  // ];
-
-  return students as StudentInterface[];
+/**
+ * Получение студентов
+ * @returns Promise<StudentInterface[]>
+ */
+export const getStudentsDb = async (): Promise<StudentInterface[]> => {
+  return await studentRepository.find();
 };
 
-export const deleteStudentDb = async (id: number): Promise<void> => {
-  const db = new sqlite3.Database(process.env.DB ?? "./db/vki-web.db");
-
-  return new Promise((resolve, reject) => {
-    const sql = "DELETE FROM student WHERE id = ?";
-
-    db.run(sql, [id], function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        console.log('далено строк: ${this.changes}');
-        resolve();
-      }
-    });
-
-    db.close();
-  });
+/**
+ * Удаления студента
+ * @param studentId ИД удаляемого студента
+ * @returns Promise<number>
+ */
+export const deleteStudentDb = async (studentId: number): Promise<number> => {
+  await studentRepository.delete(studentId);
+  return studentId;
 };
 
-export const addStudentDb = async (student: Omit<StudentInterface, 'id'>): Promise<number> => {
-  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
-
-  return new Promise((resolve, reject) => {
-    const sql = `
-      INSERT INTO student (first_name, last_name, middle_name, group_id, isDeleted) 
-      VALUES (?, ?, ?, ?, ?)
-    `;
-
-    const params = [
-      student.first_name,
-      student.last_name,
-      student.middle_name,
-      student.group_id,
-      student.isDeleted || false
-    ];
-
-    db.run(sql, params, function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        console.log(`Добавлен студент с ID: ${this.lastID}`);
-        resolve(this.lastID);
-      }
-      db.close();
-    });
+/**
+ * Добавление студента
+ * @param studentField поля студента
+ * @returns Promise<StudentInterface>
+ */
+export const addStudentDb = async (studentFields: Omit<StudentInterface, 'id'>): Promise<StudentInterface> => {
+  const student = new Student();
+  const newStudent = await studentRepository.save({
+    ...student,
+    ...studentFields,
   });
+  return newStudent;
+};
+
+/**
+ * Добавление рандомных студента
+ * @param amount количество рандомных записей
+ * @returns Promise<StudentInterface>
+ */
+export const addRandomStudentsDb = async (amount: number = 10): Promise<StudentInterface[]> => {
+  const students: StudentInterface[] = [];
+
+  for (let i = 0; i < amount; i++) {
+    const fio = getRandomFio();
+
+    const newStudent = await addStudentDb({
+      ...fio,
+      contacts: 'contact',
+      groupId: 1,
+    });
+    students.push(newStudent);
+  }
+
+  return students;
 };

@@ -5,14 +5,14 @@ import type StudentInterface from '@/types/StudentInterface';
 import styles from './AddStudent.module.scss';
 
 interface AddStudentProps {
-  onAdd: (student: Omit<StudentInterface, 'id'>) => void;
+  onAdd: (student: StudentInterface) => void; // 👈 вместо Omit
 }
 
 const AddStudent = ({ onAdd }: AddStudentProps): React.ReactElement => {
-  const { register, handleSubmit, reset } = useForm<Omit<StudentInterface, 'id'>>();
+  const { register, handleSubmit, reset } = useForm<StudentInterface>();
 
-  const onSubmit = (data: Omit<StudentInterface, 'id'>) => {
-    const preparedData = { ...data, group_id: Number(data.group_id) };
+  const onSubmit = (data: StudentInterface) => {
+    const preparedData = { ...data, group_id: Number(data.groupId) };
     onAdd(preparedData);
     reset();
   };
@@ -22,23 +22,23 @@ const AddStudent = ({ onAdd }: AddStudentProps): React.ReactElement => {
       <h3>Добавить студента</h3>
 
       <input
-        {...register('last_name', { required: true })}
+        {...register('lastName', { required: true })}
         placeholder="Фамилия"
       />
 
       <input
-        {...register('first_name', { required: true })}
+        {...register('firstName', { required: true })}
         placeholder="Имя"
       />
 
       <input
-        {...register('middle_name')}
+        {...register('middleName')}
         placeholder="Отчество"
       />
 
       <input
         type="number"
-        {...register('group_id', { required: true, valueAsNumber: true })}
+        {...register('groupId', { required: true, valueAsNumber: true })}
         placeholder="ID группы"
       />
 
